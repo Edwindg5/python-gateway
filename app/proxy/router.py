@@ -9,9 +9,23 @@ router = APIRouter()
 
 FORWARD_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE"]
 
+RUTAS_PUBLICAS = {
+    "/mobile/auth/login",
+    "/mobile/auth/register",
+    "/mobile/auth/refresh",
+    "/web/api/v1/auth/login",
+}
+
 
 @router.api_route("/mobile/{path:path}", methods=FORWARD_METHODS)
 async def proxy_mobile(path: str, request: Request):
+    if f"/mobile/{path}" in RUTAS_PUBLICAS:
+        return await forward_request(
+            request=request,
+            base_url=settings.API_MOBILE_URL,
+            path=path,
+        )
+
     try:
         auth_context = authenticate(request.headers.get("authorization"))
     except AuthError as exc:
@@ -28,6 +42,13 @@ async def proxy_mobile(path: str, request: Request):
 
 @router.api_route("/web/{path:path}", methods=FORWARD_METHODS)
 async def proxy_web(path: str, request: Request):
+    if f"/web/{path}" in RUTAS_PUBLICAS:
+        return await forward_request(
+            request=request,
+            base_url=settings.API_WEB_URL,
+            path=path,
+        )
+
     try:
         auth_context = authenticate(request.headers.get("authorization"))
     except AuthError as exc:

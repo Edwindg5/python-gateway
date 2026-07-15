@@ -18,15 +18,17 @@ async def forward_request(
     request: Request,
     base_url: str,
     path: str,
-    user_id: str,
-    rol: str,
+    user_id: str | None = None,
+    rol: str | None = None,
 ) -> Response:
     target_url = f"{base_url.rstrip('/')}/{path}"
 
     headers = dict(request.headers)
     headers.pop("host", None)
-    headers["X-User-Id"] = user_id
-    headers["X-Role"] = rol
+    if user_id is not None:
+        headers["X-User-Id"] = user_id
+    if rol is not None:
+        headers["X-Role"] = rol
 
     body = await request.body()
 

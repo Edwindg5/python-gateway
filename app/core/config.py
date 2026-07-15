@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     API_MOBILE_URL: str
     API_WEB_URL: str
     PORT: int = 8090
+    CORS_ALLOWED_ORIGIN: str = "*"
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

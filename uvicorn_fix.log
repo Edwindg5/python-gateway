@@ -2,3 +2,9 @@ INFO:     Started server process [33728]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://127.0.0.1:8090 (Press CTRL+C to quit)
+INFO:kajve_gateway:GET /health 200 0.57ms
+INFO:     127.0.0.1:52872 - "GET /health HTTP/1.1" 200 OK
+INFO:httpx:HTTP Request: POST https://api-mobile.dnc-ed-denz.shop/auth/login "HTTP/1.1 200 OK"
+INFO:kajve_gateway:POST /mobile/auth/login 200 3096.37ms
+INFO:     127.0.0.1:51239 - "POST /mobile/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51244 - "OPTIONS /mobile/auth/login HTTP/1.1" 200 OK

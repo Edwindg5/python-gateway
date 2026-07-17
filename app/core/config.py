@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     JWT_SECRET: str
     API_MOBILE_URL: str
     API_WEB_URL: str
+    PAGOS_URL: str
     PORT: int = 8090
     CORS_ALLOWED_ORIGIN: str = "*"
 

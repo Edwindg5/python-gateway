@@ -61,3 +61,19 @@ async def proxy_web(path: str, request: Request):
         user_id=auth_context.user_id,
         rol=auth_context.rol,
     )
+
+
+@router.api_route("/pagos/{path:path}", methods=FORWARD_METHODS)
+async def proxy_pagos(path: str, request: Request):
+    try:
+        auth_context = authenticate(request.headers.get("authorization"))
+    except AuthError as exc:
+        return JSONResponse(status_code=401, content={"detail": str(exc)})
+
+    return await forward_request(
+        request=request,
+        base_url=settings.PAGOS_URL,
+        path=path,
+        user_id=auth_context.user_id,
+        rol=auth_context.rol,
+    )

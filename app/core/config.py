@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     API_WEB_URL: str
     PAGOS_URL: str
     PORT: int = 8090
-    CORS_ALLOWED_ORIGIN: str = "*"
+    CORS_ALLOWED_ORIGINS: str
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
@@ -20,6 +20,10 @@ class Settings(BaseSettings):
                 "JWT_SECRET no puede estar vacio. Definilo como variable de entorno antes de arrancar el gateway."
             )
         return value
+
+    @property
+    def cors_origins_list(self) -> list[str]:
+        return [origin.strip() for origin in self.CORS_ALLOWED_ORIGINS.split(",") if origin.strip()]
 
 
 settings = Settings()

@@ -13,11 +13,9 @@ app = FastAPI(title="kajve-gateway")
 
 app.add_middleware(LoggingMiddleware)
 
-# TODO: restringir a los dominios reales del frontend despues de la entrega.
-# "*" es temporal para no bloquear el desarrollo/la demo final.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.CORS_ALLOWED_ORIGIN],
+    allow_origins=settings.cors_origins_list,
     allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["Authorization", "Content-Type"],
 )

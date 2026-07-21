@@ -1,4 +1,5 @@
 import logging
+from urllib.parse import quote
 
 import httpx
 from fastapi import Request, Response
@@ -14,6 +15,10 @@ TIMEOUT_SECONDS = 10.0
 EXCLUDED_RESPONSE_HEADERS = {"content-encoding", "content-length", "transfer-encoding", "connection"}
 
 
+def _is_valid_path(path: str) -> bool:
+    return ".." not in path and path.isprintable()
+
+
 async def forward_request(
     request: Request,
     base_url: str,
@@ -21,7 +26,14 @@ async def forward_request(
     user_id: str | None = None,
     rol: str | None = None,
 ) -> Response:
-    target_url = f"{base_url.rstrip('/')}/{path}"
+    if not _is_valid_path(path):
+        return Response(
+            content='{"detail": "Ruta inválida"}',
+            status_code=400,
+            media_type="application/json",
+        )
+
+    target_url = f"{base_url.rstrip('/')}/{quote(path, safe='/')}"
 
     headers = dict(request.headers)
     headers.pop("host", None)
@@ -44,7 +56,7 @@ async def forward_request(
     except (httpx.TimeoutException, httpx.ConnectError) as exc:
         logger.warning("Backend no respondio: %s %s -> %s", request.method, target_url, exc)
         return Response(
-            content=f'{{"detail": "El backend no respondio: {base_url}"}}',
+            content='{"detail": "El servicio no está disponible en este momento. Intenta de nuevo más tarde."}',
             status_code=502,
             media_type="application/json",
         )

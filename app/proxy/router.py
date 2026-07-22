@@ -84,3 +84,21 @@ async def proxy_pagos(path: str, request: Request):
         base_url=settings.PAGOS_URL,
         path=path,
     )
+
+
+@router.api_route("/ml/{path:path}", methods=FORWARD_METHODS)
+async def proxy_ml(path: str, request: Request):
+    try:
+        auth_context = authenticate(request.headers.get("authorization"))
+    except AuthError as exc:
+        return JSONResponse(status_code=401, content={"detail": str(exc)})
+
+    return await forward_request(
+        request=request,
+        base_url=settings.ML_SERVICE_URL,
+        path=path,
+        user_id=auth_context.user_id,
+        rol=auth_context.rol,
+        internal_api_key=settings.ML_INTERNAL_API_KEY,
+        inject_user_id_in_body=True,
+    )

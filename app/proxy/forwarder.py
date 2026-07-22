@@ -1,3 +1,4 @@
+import json
 import logging
 from urllib.parse import quote
 
@@ -19,12 +20,35 @@ def _is_valid_path(path: str) -> bool:
     return ".." not in path and path.isprintable()
 
 
+def _inject_user_id_into_body(body: bytes, user_id: str) -> bytes:
+    """Fuerza "id_usuario" en el body JSON, pisando lo que haya mandado el cliente.
+
+    Si el body esta vacio (ej. GET /dispositivos/{id}) o no es un objeto JSON,
+    se devuelve tal cual: hay endpoints de ML sin body y no hay nada que inyectar.
+    """
+    if not body:
+        return body
+
+    try:
+        data = json.loads(body)
+    except json.JSONDecodeError:
+        return body
+
+    if not isinstance(data, dict):
+        return body
+
+    data["id_usuario"] = user_id
+    return json.dumps(data).encode("utf-8")
+
+
 async def forward_request(
     request: Request,
     base_url: str,
     path: str,
     user_id: str | None = None,
     rol: str | None = None,
+    internal_api_key: str | None = None,
+    inject_user_id_in_body: bool = False,
 ) -> Response:
     if not _is_valid_path(path):
         return Response(
@@ -41,8 +65,16 @@ async def forward_request(
         headers["X-User-Id"] = user_id
     if rol is not None:
         headers["X-Role"] = rol
+    if internal_api_key is not None:
+        headers["X-Internal-Api-Key"] = internal_api_key
 
     body = await request.body()
+
+    if inject_user_id_in_body and user_id is not None:
+        body = _inject_user_id_into_body(body, user_id)
+        # el body pudo haber cambiado de tamano: si dejamos el content-length
+        # original, el backend puede truncar o rechazar el request.
+        headers.pop("content-length", None)
 
     try:
         async with httpx.AsyncClient(timeout=TIMEOUT_SECONDS) as client:

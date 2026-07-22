@@ -4,6 +4,8 @@ import time
 os.environ.setdefault("JWT_SECRET", "test-secret")
 os.environ.setdefault("API_MOBILE_URL", "http://api-mobile:8080")
 os.environ.setdefault("API_WEB_URL", "http://api-web:8000")
+os.environ.setdefault("ML_SERVICE_URL", "http://microservicio-ml:8000")
+os.environ.setdefault("ML_INTERNAL_API_KEY", "test-internal-key")
 
 import jwt
 import pytest

@@ -7,6 +7,8 @@ class Settings(BaseSettings):
     API_MOBILE_URL: str
     API_WEB_URL: str
     PAGOS_URL: str
+    ML_SERVICE_URL: str
+    ML_INTERNAL_API_KEY: str
     PORT: int = 8090
     CORS_ALLOWED_ORIGINS: str
 
